@@ -1,3 +1,17 @@
+function timeout(promise, ms){
+    return new Promise((resolve, reject)=>{
+        const e = new Error(message ? message : ("Timed out after " + ms + " ms"))
+        e.code = 'ETIMEDOUT'
+
+        const timeout = setTimeout(function(){
+            reject(e)
+        }, ms)
+        
+        promise.catch(reject).then(function(r){
+            clearTimeout(timeout)
+            resolve(r)
+        })
+    })
 function SyncFunction(limit = 100){
     let sync = new Promise(r=>r(null))
     let count = 0
@@ -12,7 +26,7 @@ function SyncFunction(limit = 100){
         }
         if(process.env.NODE_ENV !== 'production'){
             e = (new Error).stack
-            oldSync.timeout(5000).catch(ex=>{
+            timeout(oldSync, 5000).catch(ex=>{
                 if(ex.code==='ETIMEDOUT') {
                     if(sf.processing) console.log(`Possible timeout on ${sf.id} due to ${sf.processing}\nlock requested at:\n${e}\n`)
                     else  console.log("Possible timeout - lock requested at:\n"+e+"\n")
