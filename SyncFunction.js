@@ -16,7 +16,7 @@ function timeout(promise, ms){
 function SyncFunction(limit = 100){
     let sync = new Promise(r=>r(null))
     let count = 0
-    const sf = async (fn) => {
+    const sf = async (fn, ...args) => {
         const oldSync = sync
         let resolve, reject
         sync = new Promise((_resolve)=>resolve = _resolve)
@@ -39,7 +39,7 @@ function SyncFunction(limit = 100){
             sf.processing = e
         }
         try {
-            const ret = await fn()
+            const ret = await fn(...args)
             count --
             resolve()
             
