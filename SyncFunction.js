@@ -12,6 +12,7 @@ function timeout(promise, ms){
             resolve(r)
         })
     })
+}
 function SyncFunction(limit = 100){
     let sync = new Promise(r=>r(null))
     let count = 0
