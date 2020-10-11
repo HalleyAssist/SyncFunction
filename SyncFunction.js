@@ -25,7 +25,7 @@ function SyncFunction(limit = 100){
         if(++count > limit){
             console.log(`SyncFunction backlog of ${count} over limit`)
         }
-        if(process.env.NODE_ENV !== 'production'){
+        if(SyncFunction.debug){
             e = (new Error).stack
             timeout(oldSync, 5000).catch(ex=>{
                 if(ex.code==='ETIMEDOUT') {
@@ -35,7 +35,7 @@ function SyncFunction(limit = 100){
             })
         }
         await oldSync
-        if(process.env.NODE_ENV !== 'production'){
+        if(SyncFunction.debug){
             sf.processing = e
         }
         try {
@@ -43,7 +43,7 @@ function SyncFunction(limit = 100){
             count --
             resolve()
             
-            if(process.env.NODE_ENV !== 'production'){
+            if(SyncFunction.debug){
                 if(e === sf.processing) delete sf.processing
             }
             return ret
@@ -52,13 +52,13 @@ function SyncFunction(limit = 100){
             count --
             resolve()
             reject(ex)
-            if(process.env.NODE_ENV !== 'production'){
+            if(SyncFunction.debug){
                 if(e === sf.processing) delete sf.processing
             }
         }
         return await d2
     }
-    if(process.env.NODE_ENV !== 'production'){
+    if(SyncFunction.debug){
         sf.id = Math.floor(Math.random() * 100000).toString(16)
         Object.defineProperty(sf, "name", { value: "sf["+sf.id+"]" });
     }
@@ -70,21 +70,22 @@ function SyncFunction(limit = 100){
         } while(currentSync !== sync)
     }
     sf.toString = () => {
-        if(process.env.NODE_ENV === 'production'){
-            return `[SyncFunction count:${count}/${limit}]`
-        } else {
+        if(SyncFunction.debug){
             let r = `[SyncFunction(${sf.id}) count:${count}/${limit}]`
             if(sf.processing){
                 r += "\n"+sf.processing
             }
             return r
+        } else {
+            return `[SyncFunction count:${count}/${limit}]`
         }
     }
-    if(process.env.NODE_ENV !== 'production'){
+    if(SyncFunction.debug){
         sf.isLocked = function(){
             return !!sf.processing
         }
     }
     return sf
 }
+SyncFunction.debug = process.env.NODE_ENV !== 'production'
 module.exports = SyncFunction
