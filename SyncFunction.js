@@ -1,4 +1,4 @@
-function timeout(promise, ms){
+function timeout(promise, ms, message = null){
     return new Promise((resolve, reject)=>{
         const e = new Error(message ? message : ("Timed out after " + ms + " ms"))
         e.code = 'ETIMEDOUT'
@@ -26,10 +26,11 @@ function SyncFunction(limit = 100){
             console.log(`SyncFunction backlog of ${count} over limit`)
         }
         if(SyncFunction.debug){
-            e = (new Error).stack
+            e = {}
+            Error.captureStackTrace(e)
             timeout(oldSync, 5000).catch(ex=>{
                 if(ex.code==='ETIMEDOUT') {
-                    if(sf.processing) console.log(`Possible timeout on ${sf.id} due to ${sf.processing}\nlock requested at:\n${e}\n`)
+                    if(sf.processing) console.log(`Possible timeout on ${sf.id} due to ${sf.processing}\nlock requested at:\n${e.stack}\n`)
                     else  console.log("Possible timeout - lock requested at:\n"+e+"\n")
                 }
             })

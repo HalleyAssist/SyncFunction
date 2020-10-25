@@ -4,9 +4,19 @@ on:
     branches:
       - master # Change this to your default branch
 jobs:
+  check_eslint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install modules
+      run: |
+        yarn global add eslint
+        echo "::add-path::$(yarn global bin)"
+    - run: eslint SyncFunction.js
   npm-publish:
     name: npm-publish
     runs-on: ubuntu-latest
+    needs: [check_eslint]
     steps:
     - name: Checkout repository
       uses: actions/checkout@master
