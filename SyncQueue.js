@@ -6,7 +6,6 @@ function SyncQueue(){
     let currentPromise
 
     async function handleQueue (){
-        running ++
         const localQueue = queue
         queue = []
         for(const q of localQueue) {
