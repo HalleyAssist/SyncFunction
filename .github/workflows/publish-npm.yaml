@@ -10,8 +10,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install modules
       run: |
-        yarn global add eslint
-        echo "::add-path::$(yarn global bin)"
+        npm install -g eslint
     - run: eslint SyncFunction.js
   npm-publish:
     name: npm-publish
