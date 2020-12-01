@@ -1,4 +1,4 @@
-const SyncFunction = require('../SyncFunction')
+const SyncFunction = require('./SyncFunction')
 
 function SyncQueue(){
     const sync = SyncFunction(2)
@@ -6,35 +6,41 @@ function SyncQueue(){
     let currentPromise
 
     async function handleQueue (){
+        running ++
         const localQueue = queue
         queue = []
-        for(const q of localQueue){
+        for(const q of localQueue) {
             await q()
         }
+        currentPromise = null
     }
 
-    return async function(fnIn){
+    return async function(fnIn, ...args){
         let ret
+
+        // add our new fn to the queue
         const fn = async()=>{
-            ret = await fnIn()
+            try {
+                ret = await fnIn(...args)
+            } catch(ex){
+                ret = Promise.reject(ex)
+            }
         }
         queue.push(fn)
 
+        // wait on current execution
         let localPromise = currentPromise
-        if(!currentPromise){
-            currentPromise = sync(handleQueue)
-            await currentPromise
-            return ret
-        }
-
-        await localPromise
-
         while(queue.includes(fn)){
-            if(localPromise == currentPromise){
+            if(localPromise) await localPromise
+
+            if(!localPromise){
                 currentPromise = sync(handleQueue)
                 await currentPromise
             }
+            localPromise = currentPromise
         }
+
+        if(localPromise) await localPromise
 
         return ret
     }
