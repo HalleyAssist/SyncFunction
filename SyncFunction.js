@@ -30,7 +30,7 @@ function SyncFunction(limit = 100){
             Error.captureStackTrace(e)
             timeout(oldSync, 5000).catch(ex=>{
                 if(ex.code==='ETIMEDOUT') {
-                    if(sf.processing) console.log(`Possible timeout on ${sf.id} due to ${sf.processing}\nlock requested at:\n${e.stack}\n`)
+                    if(sf.processing) console.log(`Possible timeout on ${sf.id} due to ${sf.processing?sf.processing.stack:"<not captured>"}\nlock requested at:\n${e.stack}\n`)
                     else  console.log("Possible timeout - lock requested at:\n"+e+"\n")
                 }
             })
