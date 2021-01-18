@@ -7,13 +7,16 @@ function timeout(promise, ms, message = null){
             reject(e)
         }, ms)
         
-        promise.catch(reject).then(function(r){
+        promise.then(function(r){
             clearTimeout(timeout)
             resolve(r)
+        }, function(ex){
+            clearTimeout(timeout)
+            reject(ex)
         })
     })
 }
-function SyncFunction(limit = 100){
+function SyncFunction(limit = 15, id = null){
     let sync = new Promise(r=>r(null))
     let count = 0
     const sf = async (fn, ...args) => {
@@ -23,14 +26,18 @@ function SyncFunction(limit = 100){
         let e
         const d2 =  new Promise((_,_reject)=>reject = _reject)
         if(++count > limit){
-            console.log(`SyncFunction backlog of ${count} over limit`)
+            if(SyncFunction.debug) console.trace(`SyncFunction backlog of ${count} over limit`)
+            else console.log(`SyncFunction backlog of ${count} over limit`)
         }
         if(SyncFunction.debug){
+            // capture stack and convert it to string
             e = {}
             Error.captureStackTrace(e)
+            e = {stack: e.stack.toString()}
+
             timeout(oldSync, 5000).catch(ex=>{
                 if(ex.code==='ETIMEDOUT') {
-                    if(sf.processing) console.log(`Possible timeout on ${sf.id} due to ${sf.processing?sf.processing.stack:"<not captured>"}\nlock requested at:\n${e.stack}\n`)
+                    if(sf.processing) console.log(`Possible timeout with ${count} waiting on ${sf.id} due to ${sf.processing?sf.processing.stack:"<not captured>"}\nlock requested at:\n${e.stack}\n`)
                     else  console.log("Possible timeout - lock requested at:\n"+e+"\n")
                 }
             })
@@ -45,7 +52,7 @@ function SyncFunction(limit = 100){
             resolve()
             
             if(SyncFunction.debug){
-                if(e === sf.processing) delete sf.processing
+                if(e === sf.processing) sf.processing = null
             }
             return ret
         }catch(ex){
@@ -54,15 +61,17 @@ function SyncFunction(limit = 100){
             resolve()
             reject(ex)
             if(SyncFunction.debug){
-                if(e === sf.processing) delete sf.processing
+                if(e === sf.processing) sf.processing = null
             }
         }
         return await d2
     }
-    if(SyncFunction.debug){
-        sf.id = Math.floor(Math.random() * 100000).toString(16)
-        Object.defineProperty(sf, "name", { value: "sf["+sf.id+"]" });
-    }
+    
+    sf.id = id
+    if(sf.id === null) sf.id = Math.floor(Math.random() * 100000).toString(16)
+    Object.defineProperty(sf, "name", { value: "sf["+sf.id+"]" });
+
+
     sf.awaiter = async() => {
         let currentSync
         do {
@@ -88,5 +97,7 @@ function SyncFunction(limit = 100){
     }
     return sf
 }
+
 SyncFunction.debug = process.env.NODE_ENV !== 'production'
+
 module.exports = SyncFunction
