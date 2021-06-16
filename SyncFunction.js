@@ -1,3 +1,5 @@
+const assert = require('assert')
+
 function timeout(promise, ms, message = null){
     return new Promise((resolve, reject)=>{
         const e = new Error(message ? message : ("Timed out after " + ms + " ms"))
@@ -20,6 +22,7 @@ function SyncFunction(limit = 15, id = null){
     let sync = new Promise(r=>r(null))
     let count = 0
     const sf = async (fn, ...args) => {
+        assert(typeof fn === 'function')
         const oldSync = sync
         let resolve, reject
         sync = new Promise((_resolve)=>resolve = _resolve)
