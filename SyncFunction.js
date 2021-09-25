@@ -32,13 +32,13 @@ function SyncFunction(limit = 15, id = null){
             if(SyncFunction.debug) console.trace(`SyncFunction backlog of ${count} over limit`)
             else console.log(`SyncFunction backlog of ${count} over limit`)
         }
-        if(SyncFunction.debug){
+        if(SyncFunction.debug && SyncFunction.timeout){
             // capture stack and convert it to string
             e = {}
             Error.captureStackTrace(e)
             e = {stack: e.stack.toString()}
 
-            timeout(oldSync, 5000).catch(ex=>{
+            timeout(oldSync, SyncFunction.timeout).catch(ex=>{
                 if(ex.code==='ETIMEDOUT') {
                     if(sf.processing) console.log(`Possible timeout with ${count} waiting on ${sf.id} due to ${sf.processing?sf.processing.stack:"<not captured>"}\nlock requested at:\n${e.stack}\n`)
                     else  console.log("Possible timeout - lock requested at:\n"+e+"\n")
@@ -102,5 +102,6 @@ function SyncFunction(limit = 15, id = null){
 }
 
 SyncFunction.debug = process.env.NODE_ENV !== 'production'
+SyncFunction.timeout = 10000
 
 module.exports = SyncFunction
