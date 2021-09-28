@@ -1,6 +1,6 @@
 {
   "name": "syncfunction",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "self mutating mutex promise",
   "main": "index.js",
   "scripts": {
