@@ -6,6 +6,7 @@ describe('ThroatFunction', function(){
     it('should run 5 at a time with backpressure', async() => {
         const tf = ThroatFunction(5)
 
+        const deferred = Q.defer()
         async function bg(){            
             for(let i = 0; i < 10; i++){
                 await tf(()=>{
@@ -16,7 +17,6 @@ describe('ThroatFunction', function(){
         }
 
         let count = 0
-        const deferred = Q.defer()
         bg()
 
         await Q.delay(10)
@@ -24,6 +24,10 @@ describe('ThroatFunction', function(){
 
         expect(count).to.be.eql(5)
         deferred.resolve()
+
+        await Q.delay(10)
+        await tf(null)
+        expect(count).to.be.eql(10)
     })
     it('should run 5 at a time without backpressure', async() => {
         const tf = ThroatFunction(5)
@@ -42,5 +46,11 @@ describe('ThroatFunction', function(){
 
         expect(count).to.be.eql(5)
         deferred.resolve()
+
+        
+        await Q.delay(10)
+        await tf(null)
+        expect(count).to.be.eql(10)
+
     })
 })

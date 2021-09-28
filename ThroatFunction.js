@@ -1,41 +1,54 @@
-const EmptyFn = ()=>{}
-
 function ThroatFunction(n = 5){
-    const queue = new Set()
+    const running = new Set()
     let resolve, promise
+    function releasePromise(r){
+        running.delete(r)
+        if(promise) {
+            if(resolve) {
+                resolve()
+                promise = resolve = null
+            }
+        }
+    }
+
     const ResolveSet = res => resolve = res
-    return async function(what){
+    const ret = async function(what){
         if(what === null){
-            if(queue.length === 0) return
-            await Promise.all(queue)
+            if(running.size === 0) return
+            await Promise.all([...running])
             return
         }
 
         // This shouldnt happen if we correctly await on the throat
-        while(queue.size >= n){
+        while(running.size >= n){
             if(!resolve) promise = new Promise(ResolveSet)
             await promise
         }
 
         // call fn
-        queue.add(what)
-        if(typeof what === 'function'){
-            what = what()
-        }
-        what.catch(EmptyFn).then(()=>{
-            queue.delete(what)
-            if(promise) {
-                if(resolve) resolve()
-                promise = resolve = null
+        const r = new Promise(async (resolve, reject)=>{
+            try {
+                if(typeof what === 'function'){
+                    what = what()  
+                }
+                resolve(await what)
+            } catch(e){
+                reject(e)
             }
+
+            releasePromise(r)
         })
+        running.add(r)
 
-
-        if(queue.size >= n){
+        if(running.size >= n){
             if(!resolve) promise = new Promise(ResolveSet)
             await promise
         }
     }
+
+    ret.running = running
+
+    return ret
 }
 
 module.exports = ThroatFunction
