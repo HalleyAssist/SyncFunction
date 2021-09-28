@@ -24,9 +24,9 @@ function ThroatFunction(n = 5){
         }
         what.catch(EmptyFn).then(()=>{
             queue.delete(what)
-            if(deferred) {
+            if(promise) {
                 if(resolve) resolve()
-                deferred = resolve = null
+                promise = resolve = null
             }
         })
 
