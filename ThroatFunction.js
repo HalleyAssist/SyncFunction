@@ -15,7 +15,7 @@ function ThroatFunction(n = 5){
     const ret = async function(what){
         if(what === null){
             if(running.size === 0) return
-            await Promise.all([...running])
+            await Promise.all(running)
             return
         }
 
