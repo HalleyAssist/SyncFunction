@@ -13,8 +13,8 @@ function SyncFunction(limit = 15, id = null){
         let e
         const d2 =  new Promise((_,_reject)=>reject = _reject)
         if(++count > limit){
-            if(debug) sf.debugLog(`SyncFunction backlog of ${count} over limit`)
-            else sf.debugLog(`SyncFunction backlog of ${count} over limit`)
+            if(debug) sf.debugLog(`${sf.name} backlog of ${count} over limit`)
+            else sf.debugLog(`${sf.name} backlog of ${count} over limit`)
         }
         
         await oldSync
@@ -59,7 +59,7 @@ function SyncFunction(limit = 15, id = null){
     
     sf.id = id
     if(sf.id === null) sf.id = Math.floor(Math.random() * 100000).toString(16)
-    Object.defineProperty(sf, "name", { value: `sf[${sf.id}]` });
+    Object.defineProperty(sf, "name", { value: `SyncFunction[${sf.id}]` });
 
 
     sf.awaiter = async() => {
