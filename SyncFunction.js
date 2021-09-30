@@ -59,7 +59,7 @@ function SyncFunction(limit = 15, id = null){
     
     sf.id = id
     if(sf.id === null) sf.id = Math.floor(Math.random() * 100000).toString(16)
-    Object.defineProperty(sf, "name", { value: `SyncFunction[${sf.id}]` });
+    Object.defineProperty(sf, "name", { value: `SyncFunction(${sf.id})` });
 
 
     sf.awaiter = async() => {
