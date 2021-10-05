@@ -13,8 +13,8 @@ function SyncFunction(limit = 15, id = null){
         let e
         const d2 =  new Promise((_,_reject)=>reject = _reject)
         if(++count > limit){
-            if(debug) sf.debugLog(`${sf.name} backlog of ${count} over limit`)
-            else sf.debugLog(`${sf.name} backlog of ${count} over limit`)
+            if(debug) sf.debugLog(`${sf.name} backlog of ${count} over limit`, "overlimit")
+            else sf.debugLog(`${sf.name} backlog of ${count} over limit`, "overlimit")
         }
         
         await oldSync
@@ -28,8 +28,8 @@ function SyncFunction(limit = 15, id = null){
 
             if(debugTimeout > 0){
                 e.timeout = setTimeout(()=>{
-                    if(sf.processing) sf.debugLog(`Possible timeout with ${count} waiting on ${sf.id} due to ${e.stack}\n`)
-                    else  sf.debugLog("Possible timeout - lock requested at:\n"+e+"\n")
+                    if(sf.processing) sf.debugLog(`Possible timeout with ${count} waiting on ${sf.id} due to ${e.stack}\n`, "timeout")
+                    else  sf.debugLog("Possible timeout - lock requested at:\n"+e+"\n", "timeout")
                 }, debugTimeout)
             }
         }
@@ -83,7 +83,7 @@ function SyncFunction(limit = 15, id = null){
     sf.isLocked = function(){
         return !!sf.processing
     }
-    sf.debugLog = console.log
+    sf.debugLog = SyncFunction.debugLog
 
     return sf
 }
@@ -106,5 +106,6 @@ if(process.env.NODE_ENV !== 'production'){
     SyncFunction.debug = true
 }
 
+SyncFunction.debugLog = console.log
 
 module.exports = SyncFunction
