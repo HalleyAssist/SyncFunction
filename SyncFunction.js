@@ -28,7 +28,7 @@ function SyncFunction(limit = 15, id = null){
 
             if(debugTimeout > 0){
                 e.timeout = setTimeout(()=>{
-                    if(sf.processing) sf.debugLog(`Possible timeout with ${count} waiting on ${sf.id} due to ${e.stack}\n`, "timeout")
+                    if(sf.processing) sf.debugLog(`Possible timeout after ${debugTimeout}ms with ${count} waiting on ${sf.id} due to ${e.stack}\n`, "timeout")
                     else  sf.debugLog("Possible timeout - lock requested at:\n"+e+"\n", "timeout")
                 }, debugTimeout)
             }
