@@ -16,9 +16,11 @@
     "url": "https://github.com/HalleyAssist/SyncFunction/issues"
   },
   "homepage": "https://github.com/HalleyAssist/SyncFunction#readme",
+  "dependencies": {
+    "q-lite": "git+https://github.com/HalleyAssist/q-lite.git"
+  },
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^8.2.1",
-    "q": "^1.5.1"
+    "mocha": "^8.2.1"
   }
 }

@@ -1,7 +1,6 @@
-const SyncFunction = require('../SyncFunction'),
-      SyncQueue = require('../SyncQueue'),
+const {SyncFunction, SyncQueue} = require('../index'),
      {expect} = require('chai'),
-      Q = require('q')
+      Q = require('q-lite')
 
 describe('SyncFunction', function(){
     describe('function', function(){

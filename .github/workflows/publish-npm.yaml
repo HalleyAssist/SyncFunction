@@ -11,7 +11,7 @@ jobs:
     - name: Install modules
       run: |
         sudo npm install -g eslint
-    - run: eslint SyncFunction.js
+    - run: eslint index.js lib --ext .js,.jsx,.ts,.tsx
   npm-publish:
     name: npm-publish
     runs-on: ubuntu-latest
