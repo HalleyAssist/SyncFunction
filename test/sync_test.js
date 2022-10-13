@@ -1,6 +1,6 @@
 const {SyncFunction, SyncQueue} = require('../index'),
      {expect} = require('chai'),
-      Q = require('q-lite')
+      Q = require('@halleyassist/q-lite')
 
 describe('SyncFunction', function(){
     describe('function', function(){

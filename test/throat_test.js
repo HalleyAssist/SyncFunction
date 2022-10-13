@@ -1,6 +1,6 @@
 const {ThroatFunction} = require('../index'),
      {expect} = require('chai'),
-      Q = require('q-lite')
+      Q = require('@halleyassist/q-lite')
 
 describe('ThroatFunction', function(){
     it('should run 5 at a time with backpressure', async() => {

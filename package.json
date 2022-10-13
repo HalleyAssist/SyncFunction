@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/HalleyAssist/SyncFunction#readme",
   "dependencies": {
-    "q-lite": "git+https://github.com/HalleyAssist/q-lite.git"
+    "@halleyassist/q-lite": "^0.9.6"
   },
   "devDependencies": {
     "chai": "^4.2.0",
