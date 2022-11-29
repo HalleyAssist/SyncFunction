@@ -79,6 +79,36 @@ describe('ThroatQueueFunction', function(){
         expect(count).to.be.eql(10)
 
     })
+    it('return value should work', async() => {
+        const tf = ThroatQueueFunction(5)
+
+        const ps = []
+        let count = 0
+        const deferred = Q.defer()
+        for(let i = 0; i < 10; i++){
+            ps.push(tf(async ()=>{
+                count++
+                await deferred.promise
+                return i
+            }))
+        }
+
+        await Q.delay(10)
+
+
+        expect(count).to.be.eql(5)
+        deferred.resolve()
+
+        
+        await Q.delay(10)
+        await tf(null)
+        expect(count).to.be.eql(10)
+
+        for(let i = 0; i < 10; i++){
+            expect(await ps[i]).to.be.eql(i)
+        }
+
+    })
     it('should run 5 times only if cancelled from fn', async() => {
         const tf = ThroatQueueFunction(5)
 
