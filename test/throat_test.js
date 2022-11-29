@@ -1,4 +1,4 @@
-const {ThroatFunction} = require('../index'),
+const {ThroatFunction, ThroatQueueFunction} = require('../index'),
      {expect} = require('chai'),
       Q = require('@halleyassist/q-lite')
 
@@ -52,5 +52,56 @@ describe('ThroatFunction', function(){
         await tf(null)
         expect(count).to.be.eql(10)
 
+    })
+})
+describe('ThroatQueueFunction', function(){
+    it('should run 5 at a time without backpressure', async() => {
+        const tf = ThroatQueueFunction(5)
+
+        let count = 0
+        const deferred = Q.defer()
+        for(let i = 0; i < 10; i++){
+            tf(()=>{
+                count++
+                return deferred.promise
+            })
+        }
+
+        await Q.delay(10)
+
+
+        expect(count).to.be.eql(5)
+        deferred.resolve()
+
+        
+        await Q.delay(10)
+        await tf(null)
+        expect(count).to.be.eql(10)
+
+    })
+    it('should capture stack trace', async() => {
+        async function testFn(){
+            const errors = []
+            const tf = ThroatQueueFunction(5)
+
+            for(let i = 0; i < 10; i++){
+                try {
+                    await tf(()=>{
+                        throw new Error('test')
+                    })
+                } catch(ex) {
+                    errors.push(ex)
+                }
+            }
+
+            return errors
+        }
+
+        const errors = await testFn()
+        expect(errors.length).to.be.eql(10)
+        for(const e of errors){
+            expect(e.stack).to.be.a('string')
+            expect(e.stack).to.contain('testFn')
+        }
     })
 })
