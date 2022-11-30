@@ -134,6 +134,9 @@ describe('ThroatQueueFunction', function(){
         deferred.resolve(true)
 
         await tf(null)
+
+        await Q.delay(10)
+
         expect(count).to.be.eql(5)
 
     })
@@ -189,6 +192,63 @@ describe('ThroatQueueFunction', function(){
         const errors = await testFn()
         expect(errors.length).to.be.eql(10)
         for(const e of errors){
+            expect(e.stack).to.be.a('string')
+            expect(e.stack).to.contain('testFn')
+        }
+    })
+
+    
+    it('should capture stack trace (2)', async() => {
+        async function testFn(){
+            const errors = []
+            const tf = ThroatQueueFunction(5)
+
+            for(let i = 0; i < 10; i++){
+                try {
+                    await tf(async ()=>{
+                        await Q.delay(1)
+                        throw new Error('test')
+                    })
+                } catch(ex) {
+                    errors.push(ex)
+                }
+            }
+
+            return errors
+        }
+
+        const errors = await testFn()
+        expect(errors.length).to.be.eql(10)
+        for(const e of errors){
+            expect(e.stack).to.be.a('string')
+            expect(e.stack).to.contain('testFn')
+        }
+    })
+    it('should capture stack trace (3)', async() => {
+        async function testFn(){
+            const errors = []
+            const tf = ThroatQueueFunction(5)
+
+            for(let i = 0; i < 10; i++){
+                const p = tf(async ()=>{
+                    await Q.delay(1)
+                    throw new Error('test')
+                })
+                errors.push(p.catch(ex=>ex))
+            }
+
+            const ret = []
+            for(let e of errors){
+                e = await e
+                ret.push(e)
+            }
+
+            return ret
+        }
+
+        const errors = await testFn()
+        expect(errors.length).to.be.eql(10)
+        for(let e of errors){
             expect(e.stack).to.be.a('string')
             expect(e.stack).to.contain('testFn')
         }
