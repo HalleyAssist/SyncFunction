@@ -253,4 +253,37 @@ describe('ThroatQueueFunction', function(){
             expect(e.stack).to.contain('testFn')
         }
     })
+    it('AA should capture stack trace (4)', async() => {
+        async function testFn(){
+            const errors = []
+            const tf = ThroatQueueFunction(5)
+            const tf2 = ThroatQueueFunction(3)
+
+            for(let i = 0; i < 10; i++){
+                const p = tf(async ()=>{
+                    await Q.delay(1)
+                    await tf2(async()=>{
+                        await Q.delay(1)
+                        throw new Error('test')
+                    })
+                })
+                errors.push(p.catch(ex=>ex))
+            }
+
+            const ret = []
+            for(let e of errors){
+                e = await e
+                ret.push(e)
+            }
+
+            return ret
+        }
+
+        const errors = await testFn()
+        expect(errors.length).to.be.eql(10)
+        for(let e of errors){
+            expect(e.stack).to.be.a('string')
+            expect(e.stack).to.contain('testFn')
+        }
+    })
 })
