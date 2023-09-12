@@ -119,7 +119,7 @@ describe('ThroatQueueFunction', function(){
             p.push(tf(()=>{
                 count++
                 return deferred.promise
-            }))
+            }, true))
         }
 
         await Q.delay(10)
@@ -133,7 +133,7 @@ describe('ThroatQueueFunction', function(){
 
         deferred.resolve(true)
 
-        await tf(null)
+        const a = await tf(null)
 
         await Q.delay(10)
 
@@ -150,13 +150,13 @@ describe('ThroatQueueFunction', function(){
             p.push(tf(Q.canceller(async(cancellationState)=>{
                 await cancellationState.promiseWrap(deferred.promise)
                 count++
-            })))
+            }), true))
         }
 
         await Q.delay(10)
 
 
-        expect(tf.running.length).to.be.eql(5)
+        expect(tf.executing.length).to.be.eql(5)
         
         for(const pp of tf.running){
             pp.cancel()
@@ -165,7 +165,7 @@ describe('ThroatQueueFunction', function(){
         deferred.resolve(true)
 
 
-        expect(tf.running.length).to.be.eql(5)
+        expect(tf.executing.length).to.be.eql(5)
 
         await tf(null)
         expect(count).to.be.eql(5)
