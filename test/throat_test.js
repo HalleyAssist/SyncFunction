@@ -109,6 +109,50 @@ describe('ThroatQueueFunction', function(){
         }
 
     })
+    it('should run 5 completing on exceptions', async() => {
+        const tf = ThroatQueueFunction(5)
+
+        let count = 0
+        for(let i = 0; i < 5; i++){
+            tf(async ()=>{
+                count++
+                throw new Error('expected')
+            })
+        }
+
+        await Q.delay(10)
+
+
+        expect(count).to.be.eql(5)
+
+        
+        await Q.delay(10)
+        await tf(null)
+        expect(count).to.be.eql(5)
+
+    })
+    it('should run 10 completing on exceptions', async() => {
+        const tf = ThroatQueueFunction(5)
+
+        let count = 0
+        for(let i = 0; i < 10; i++){
+            tf(async ()=>{
+                count++
+                throw new Error('expected')
+            })
+        }
+
+        await Q.delay(10)
+
+
+        expect(count).to.be.eql(10)
+
+        
+        await Q.delay(10)
+        await tf(null)
+        expect(count).to.be.eql(10)
+
+    })
     it('should run 5 times only if cancelled from fn', async() => {
         const tf = ThroatQueueFunction(5)
 
